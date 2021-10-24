@@ -1,6 +1,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <string>
 
 using std::cerr;
 using std::cout;
@@ -8,6 +9,15 @@ using std::endl;
 using std::ifstream;
 using std::ios;
 using std::vector;
+
+void printElfFile(unsigned char* file, int size) {
+    if (memcmp("\177ELF", file, 4) == 0) {
+      cout << "Elf signature" << endl;
+    }else {
+      cerr << "No elf signature" << endl;
+      return;
+    }
+}
 
 int main(int argc, char** argv) {
   cout << "Elf reader" << endl;
@@ -30,5 +40,6 @@ int main(int argc, char** argv) {
         fileSize++;
     }
     input.close();
-  return 0;
+    printElfFile(fileContent.data(), fileSize);
+    return 0;
 }
