@@ -3,6 +3,7 @@
 #include <vector>
 #include <cstring>
 #include <cstdint>
+#include <cstdio>
 
 using std::cerr;
 using std::cout;
@@ -61,6 +62,18 @@ const char* getInstructionSetName(int16_t id) {
     }
 }
 
+void* readPointer(const unsigned char* buffer, int pointerBits, int sourceEndianness) {
+    switch (pointerBits) {
+        case 32:
+          return (void*)fixEndianness(*(int32_t*)buffer, sourceEndianness);
+          case 64:
+          return (void*)fixEndianness(*(int64_t*)buffer, sourceEndianness);
+          default:
+            cerr << "Unknown pointer width" << pointerBits << endl;
+            return 0;
+    }
+}
+
 void printElfFile(unsigned char* file, int size) {
     if (memcmp("\177ELF", file, 4) == 0) {
       cout << "Elf signature" << endl;
@@ -68,13 +81,16 @@ void printElfFile(unsigned char* file, int size) {
       cerr << "No elf signature" << endl;
       return;
     }
+    int bits;
     switch (file[4]) {
         case 1: {
           cout << "32 bit" << endl;
+          bits = 32;
           break;
         }
         case 2: {
           cout << "64 bit" << endl;
+          bits = 64;
           break;
         }
         default:
@@ -139,6 +155,7 @@ void printElfFile(unsigned char* file, int size) {
       return;
     }
     cout << instructionSet << endl;
+    printf("Entry point %p\n", readPointer(file + 24, bits, endianness));
 }
 
 int main(int argc, char** argv) {
