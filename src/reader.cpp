@@ -31,6 +31,35 @@ static inline t fixEndianness(t n, int targetEndianness) {
     return n;
 }
 
+const char* getInstructionSetName(int16_t id) {
+    switch (id) {
+        case 0:
+          return "Unspecified";
+          case 2:
+            return "Sparc";
+            case 3:
+              return "IA32";
+              case 8:
+                return "Mips";
+                case 0x14:
+                  return "Power PC";
+                  case 0x28:
+                    return "arm";
+                    case 0x2a:
+                      return "SuperH";
+                      case 0x32:
+                        return "Itanium";
+                        case 0x3e:
+                          return "Amd64";
+                          case 0xb7:
+                            return "Aarch64";
+                            case 0xf3:
+                              return "Risc-V";
+                              default:
+                                return nullptr;
+    }
+}
+
 void printElfFile(unsigned char* file, int size) {
     if (memcmp("\177ELF", file, 4) == 0) {
       cout << "Elf signature" << endl;
@@ -103,6 +132,12 @@ void printElfFile(unsigned char* file, int size) {
           cerr << "Unknown elf file type" << endl;
           return;
     }
+    const char* instructionSet = getInstructionSetName(fixEndianness(((int16_t*)file)[9], endianness));
+    if (instructionSet == nullptr) {
+      cerr << "Unknown instruction set" << endl;
+      return;
+    }
+    cout << instructionSet << endl;
 }
 
 int main(int argc, char** argv) {
