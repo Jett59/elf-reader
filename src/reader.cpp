@@ -12,6 +12,25 @@ using std::ifstream;
 using std::ios;
 using std::vector;
 
+enum ProgramHeaderEntryType : uint32_t {
+  NONE = 0,
+  LOADABLE = 1,
+  DYNAMIC = 2,
+  INTERPRETER = 3,
+  NOTE = 4
+};
+
+struct ProgramHeaderEntry {
+  ProgramHeaderEntryType type;
+  uint32_t flags;
+  uint64_t file_offset;
+  void* virtual_address;
+  uint64_t ignored;
+  uint64_t file_size;
+  uint64_t memory_size;
+  uint64_t alignment;
+};
+
 #define LITTLE_ENDIAN 0
 #define BIG_ENDIAN 1
 
@@ -163,11 +182,42 @@ void printElfFile(unsigned char* file, int size) {
       cerr << "Only 64 bit executables are supported" << endl;
       return;
     }
-    void* programHeader = file + fixEndianness(((int64_t*)file)[4], endianness);
-    if (programHeader == file) {
+    ProgramHeaderEntry* programHeader = (ProgramHeaderEntry*)(file + fixEndianness(((int64_t*)file)[4], endianness));
+    if ((void*)programHeader == (void*)file) {
       cerr << "Missing program header" << endl;
       return;
     }
+    int number_of_sections = fixEndianness(((int16_t*)file)[28], endianness);
+    cout << number_of_sections << " sections:" << endl;
+    for (int i = 0; i < number_of_sections; i ++) {
+      ProgramHeaderEntry section = programHeader[i];
+      cout << "Section" << endl;
+      switch (section.type) {
+        case NONE: {
+          cout << "Null" << endl;
+          continue;
+        }
+        case LOADABLE: {
+          cout << "Loadable" << endl;
+          break;
+        }
+        case DYNAMIC: {
+          cout << "Dynamic" << endl;
+          break;
+        }
+        case INTERPRETER: {
+          cout << "Interpreter" << endl;
+          break;
+        }
+        case NOTE: {
+          cout << "note" << endl;
+          break;
+        }
+        default:
+          cerr << "Unknown" << endl;
+          continue;
+      }
+  }
 }
 
 int main(int argc, char** argv) {
