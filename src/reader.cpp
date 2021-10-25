@@ -217,6 +217,17 @@ void printElfFile(unsigned char* file, int size) {
           cerr << "Unknown" << endl;
           continue;
       }
+      printf("Flags: %x\n", section.flags);
+      if (section.flags & 1) {
+        cout << "Executable ";
+      }
+      if (section.flags & 2) {
+        cout << "Writable ";
+      }
+      if (section.flags & 4) {
+        cout << "Readable";
+      }
+      cout << endl;
   }
 }
 
