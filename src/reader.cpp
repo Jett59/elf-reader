@@ -159,6 +159,15 @@ void printElfFile(unsigned char* file, int size) {
     if (entrypoint != nullptr) {
     printf("Entry point %p\n", entrypoint);
     }
+    if (bits != 64) {
+      cerr << "Only 64 bit executables are supported" << endl;
+      return;
+    }
+    void* programHeader = file + fixEndianness(((int64_t*)file)[4], endianness);
+    if (programHeader == file) {
+      cerr << "Missing program header" << endl;
+      return;
+    }
 }
 
 int main(int argc, char** argv) {
