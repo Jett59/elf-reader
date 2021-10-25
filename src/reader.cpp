@@ -191,6 +191,14 @@ void printElfFile(unsigned char* file, int size) {
     cout << number_of_sections << " sections:" << endl;
     for (int i = 0; i < number_of_sections; i ++) {
       ProgramHeaderEntry section = programHeader[i];
+      section.type = fixEndianness(section.type, endianness);
+      section.flags = fixEndianness(section.flags, endianness);
+      section.file_offset = fixEndianness(section.file_offset, endianness);
+      section.file_size = fixEndianness(section.file_size, endianness);
+      section.virtual_address =
+          fixEndianness(section.virtual_address, endianness);
+      section.memory_size = fixEndianness(section.memory_size, endianness);
+      section.alignment = fixEndianness(section.alignment, endianness);
       cout << "Section" << endl;
       switch (section.type) {
         case NONE: {
@@ -214,7 +222,7 @@ void printElfFile(unsigned char* file, int size) {
           break;
         }
         default:
-          cerr << "Unknown" << endl;
+          cerr << "Unknown: " << section.type << endl;
           continue;
       }
       printf("Flags: %x\n", section.flags);
@@ -228,6 +236,10 @@ void printElfFile(unsigned char* file, int size) {
         cout << "Readable";
       }
       cout << endl;
+      cout << "File offset: " << section.file_offset << endl;
+      cout << "Size in file: " << section.file_size << endl;
+      cout << "Address in memory: " << section.virtual_address << endl;
+      cout << "Size in memory: " << section.memory_size << endl;
   }
 }
 
