@@ -24,7 +24,7 @@ template <typename t>
 static inline t fixEndianness(t n, int targetEndianness) {
     if (currentEndianness() != targetEndianness) {
       char* bytes = (char*)&n;
-      for (int i = 0; i < sizeof(n); i ++) {
+      for (int i = 0; i < sizeof(n) / 2; i ++) {
         char tmpByte = bytes[sizeof(n) - i - 1];
         bytes[sizeof(n) - i - 1] = bytes[i];
         bytes[i] = tmpByte;
@@ -146,7 +146,7 @@ void printElfFile(unsigned char* file, int size) {
           break;
         }
         default:
-          cerr << "Unknown elf file type" << endl;
+         cerr << "Unknown elf file type" << endl;
           return;
     }
     const char* instructionSet = getInstructionSetName(fixEndianness(((int16_t*)file)[9], endianness));
