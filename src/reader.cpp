@@ -155,7 +155,10 @@ void printElfFile(unsigned char* file, int size) {
       return;
     }
     cout << instructionSet << endl;
-    printf("Entry point %p\n", readPointer(file + 24, bits, endianness));
+    void* entrypoint = readPointer(file + 24, bits, endianness);
+    if (entrypoint != nullptr) {
+    printf("Entry point %p\n", entrypoint);
+    }
 }
 
 int main(int argc, char** argv) {
